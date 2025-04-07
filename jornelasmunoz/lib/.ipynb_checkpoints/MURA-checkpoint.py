@@ -89,9 +89,9 @@ def FFT_convolve(A, B, p=None):
     fft_A = fft2(A)
     fft_B = fft2(B)
     conv_AB = torch.real(ifft2(torch.multiply(fft_A,fft_B)))
-    # conv_AB = torch.roll(conv_AB, [int((p-1)/2),int((p-1)/2)], dims=(0,1))
+    conv_AB = torch.roll(conv_AB, [int((p-1)/2),int((p-1)/2)], dims=(0,1))
     # conv_AB = torch.roll(conv_AB, [int((p+1)/2),int((p+1)/2)], dims=(0,1))
-    conv_AB = torch.roll(conv_AB, [int((p)/2),int((p)/2)], dims=(0,1))
+    # conv_AB = torch.roll(conv_AB, [int((p)/2),int((p)/2)], dims=(0,1))
     return conv_AB
 
 def add_Gaussian_noise(og_image, desired_snr):

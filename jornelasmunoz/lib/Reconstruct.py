@@ -25,6 +25,8 @@ class RECON_CNN(torch.nn.Module):
         # Define model architecture elements
         # Padding is circular -- mathematical motivation
         self.conv  = torch.nn.Conv2d(1,1,kernel_size=self.kernel_size, padding='same', padding_mode='circular', bias=False)#(self.kernel_size-1)//2)
+        # self.conv  = torch.nn.Conv2d(1,1,kernel_size=self.kernel_size, padding='same', padding_mode='zeros', bias=False)#(self.kernel_size-1)//2)
+
         print("Using the following parameters:")
         for key, val in self.params.items():
             print(f"{key}: {val}")
@@ -41,13 +43,15 @@ class RECON_CNN(torch.nn.Module):
         self.total_params = sum(p.numel() for p in self.parameters())
         
     def forward(self, x):
-        output = self.conv(x)
-        return output
+        x = self.conv(x)
+        # Added 4/7/2025 while debugging because gradients blowing up
+        x = torch.clamp(x, min=-1e3, max=1e3)
+        return x
 
     def weights_init(self, m):
         classname = m.__class__.__name__
         if classname.find('Conv') != -1:
-            torch.nn.init.ones_(m.weight.data) #normal_(m.weight.data, 0.0, 0.02)
+            torch.nn.init.normal_(m.weight.data, 0.0, 0.02) #torch.nn.init.ones_(m.weight.data) #torch.nn.init.xavier_uniform_(m.weight.data) #
             # torch.nn.init.uniform_(m.weight.data, a=-1, b=1) #uniform
     # def weights_init_true_decoder(self, m):
     #     classname = m.__class__.__name__
